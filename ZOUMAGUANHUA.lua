@@ -1873,7 +1873,7 @@ Tab1:AddButton({
 })
 Tab1:AddButton({
     Title = "走马观花X🐧交流群",           -- 按钮标题
-    Desc = "947178829",   -- 按钮描述（可选）
+    Desc = "758776178",   -- 按钮描述（可选）
     Callback = function()
         print("114514")
     end
