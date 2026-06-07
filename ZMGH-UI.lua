@@ -183,7 +183,7 @@ end
       Main.AnchorPoint = Vector2.new(0.5, 0.5)
       Main.BackgroundColor3 = Background
       Main.BorderColor3 = MainColor
-      Main.BackgroundTransparency = 0
+      Main.BackgroundTransparency = 1
       Main.Position = UDim2.new(0.5, 0, 0.5, 0)
       Main.Size = UDim2.new(0, 572, 0, 353)
       Main.ZIndex = 1
@@ -304,6 +304,7 @@ end
       SB.Parent = Main
       SB.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
       SB.BorderColor3 = MainColor
+      SB.BackgroundTransparency = 0.5
       SB.Size = UDim2.new(0, 8, 0, 353)
       
       SBC.CornerRadius = UDim.new(0, 10)
@@ -315,6 +316,7 @@ end
       Side.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
       Side.BorderColor3 = Color3.fromRGB(255, 255, 255)
       Side.BorderSizePixel = 0
+      Side.BackgroundTransparency = 0.5
       Side.ClipsDescendants = true
       Side.Position = UDim2.new(1, 0, 0, 0)
       Side.Size = UDim2.new(0, 110, 0, 353)
@@ -476,7 +478,10 @@ end
       Open.TextSize = 14.000
       Open.Active = true
       Open.Draggable = true
-      
+      Open.MouseButton1Click:Connect(function()
+          Main.Visible = not Main.Visible
+      end)
+      UIG.Parent = Open
       
       --总开关后面的背景
       local openBg = Instance.new("ImageLabel")
@@ -496,94 +501,13 @@ end
       
       
       
-      --11111
-      --开关渐变
-      Open.MouseButton1Click:Connect(function()
-          if Main.Visible then
-        -- 当前可见 → 执行淡出动画，结束后隐藏
-              local fadeOut = TweenInfo.new(0.2, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-              local tweens = {}
-        -- 收集所有需要透明度的部件
-              local function addTween(obj, prop, target)
-                  table.insert(tweens, services.TweenService:Create(obj, fadeOut, {[prop] = target}))
-              end
-        -- 主框架及主要背景部件
-            
-              addTween(Main, "BackgroundTransparency", 1)
-              addTween(Side, "BackgroundTransparency", 1)
-              addTween(SB, "BackgroundTransparency", 1)
-              addTween(TabMain, "BackgroundTransparency", 1)
-        -- 所有文本和图像标签（避免过于复杂，可以只处理已知的直接子控件）
-              for _, child in ipairs(Main:GetDescendants()) do
-                  if child:IsA("TextLabel") or child:IsA("Text") or child:IsA("TextBox") then
-                      addTween(child, "TextTransparency", 1)
-                  elseif child:IsA("ImageLabel") and child ~= DropShadow then
-                      addTween(child, "ImageTransparency", 1)
-                  elseif child:IsA("Frame") and child ~= Main and child ~= Side and child ~= SB and child.Name ~= "ToggleDisable" and child.Name ~= "ToggleSwitch" and child ~= TabMain then
-                      addTween(child, "BackgroundTransparency", 1)
-                  end
-              end
-        -- 同时播放所有淡出动画
-              for _, tween in ipairs(tweens) do tween:Play() end
-        -- 等待最长动画结束
-              task.wait(0.2)
-              Main.Visible = false
-          else
-        -- 当前隐藏 → 先设为可见但全透明，然后淡入
-              Main.Visible = true
-        -- 立即将所有相关透明度设为 1（全透明）
-              local function setTransparent(obj)
-                  if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
-                      obj.TextTransparency = 0
-                  elseif obj:IsA("ImageLabel") and obj ~= DropShadow then
-                      obj.ImageTransparency = 1
-                 -- elseif obj:IsA("Frame") and obj.Name ~="ToggleDisable" then
-                    --  obj.BackgroundTransparency = 1
-                  end
-              end
-              setTransparent(Main)
-              setTransparent(Side)
-              setTransparent(SB)
-              setTransparent(TabMain)
-              for _, child in ipairs(Main:GetDescendants()) do
-                  setTransparent(child)
-              end
-        -- 淡入动画
-              local fadeIn = TweenInfo.new(0.2, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
-              local tweens = {}
-              local function addTweenIn(obj, prop, target)
-                  table.insert(tweens, services.TweenService:Create(obj, fadeIn, {[prop] = target}))
-              end
-              addTweenIn(Main, "BackgroundTransparency", 1)
-              addTweenIn(Side, "BackgroundTransparency", 1)
-              addTweenIn(SB, "BackgroundTransparency", 1)
-              addTweenIn(TabMain, "BackgroundTransparency", 1)
-              for _, child in ipairs(Main:GetDescendants()) do
-                 -- if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") and child.Name ~= "SectionText" and child.Name ~= "TabText" then
-                    --  addTweenIn(child, "TextTransparency", 0)
-                     -- addTweenIn(child, "BackgroundTransparency", 0.5)
-                  if child:IsA("ImageLabel") and child ~= DropShadow then
-                      addTweenIn(child, "ImageTransparency", 0)
-                  elseif child:IsA("Frame") and child ~= Main and child ~= Side and child ~= SB and child.Name ~= "ToggleDisable" and child.Name ~= "ToggleSwitch" and child ~= TabMain then
-                      addTweenIn(child, "BackgroundTransparency", 1)
-                  end
-              end
-              for _, child in ipairs(Main.TabMain:GetDescendants()) do
-                  if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") and child.Name ~= "SectionText" and child.Name ~= "TabText" then
-                      addTweenIn(child, "TextTransparency", 0)
-                      addTweenIn(child, "BackgroundTransparency", 0.5)
-                  end
-              end
-              for _, tween in ipairs(tweens) do tween:Play() end
-          end
-      end)
       
       
       
       
       
       
-      UIG.Parent = Open
+      
       local window = {}
       function window.Tab(window, name, icon)
         local Tab = Instance.new("ScrollingFrame")
@@ -760,6 +684,7 @@ end
             Btn.Name = "Btn"
             Btn.Parent = BtnModule
             Btn.BackgroundColor3 = zyColor
+            Btn.BackgroundTransparency = 0.5
             Btn.BorderSizePixel = 0
             Btn.Size = UDim2.new(0, 428, 0, 38)
             Btn.AutoButtonColor = false
@@ -796,11 +721,11 @@ end
           LabelModule.Name = "LabelModule"
           LabelModule.Parent = Objs
           LabelModule.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-          LabelModule.BackgroundTransparency = 1.000
+          LabelModule.BackgroundTransparency = 1
           LabelModule.BorderSizePixel = 0
           LabelModule.Position = UDim2.new(0, 0, NAN, 0)
           LabelModule.Size = UDim2.new(0, 428, 0, 19)
-    
+          
           TextLabel.Parent = LabelModule
           TextLabel.BackgroundColor3 = zyColor
           TextLabel.Size = UDim2.new(0, 428, 0, 22)
@@ -869,6 +794,7 @@ end
             ToggleBtn.Name = "ToggleBtn"
             ToggleBtn.Parent = ToggleModule
             ToggleBtn.BackgroundColor3 = zyColor
+            ToggleBtn.BackgroundTransparency = 0.5
             ToggleBtn.BorderSizePixel = 0
             ToggleBtn.Size = UDim2.new(0, 428, 0, 38)
             ToggleBtn.AutoButtonColor = false
@@ -1072,6 +998,7 @@ end
             TextboxBack.Name = "TextboxBack"
             TextboxBack.Parent = TextboxModule
             TextboxBack.BackgroundColor3 = zyColor
+            TextboxBack.BackgroundTransparency = 0.5
             TextboxBack.BorderSizePixel = 0
             TextboxBack.Size = UDim2.new(0, 428, 0, 38)
             TextboxBack.AutoButtonColor = false
@@ -1089,6 +1016,7 @@ end
             BoxBG.Parent = TextboxBack
             BoxBG.BackgroundColor3 = Background
             BoxBG.BorderSizePixel = 0
+           -- BoxBG.BackgroundTransparency = 0.5
             BoxBG.Position = UDim2.new(0.763033211, 0, 0.289473683, 0)
             BoxBG.Size = UDim2.new(0, 100, 0, 28)
             BoxBG.AutoButtonColor = false
@@ -1164,6 +1092,7 @@ end
             SliderModule.Name = "SliderModule"
             SliderModule.Parent = Objs
             SliderModule.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            SliderModule.BackgroundTransparency = 0.5
             SliderModule.BackgroundTransparency = 1.000
             SliderModule.BorderSizePixel = 0
             SliderModule.Position = UDim2.new(0, 0, 0, 0)
@@ -1395,6 +1324,7 @@ end
             
             DropdownTop.Name = "DropdownTop"
             DropdownTop.Parent = DropdownModule
+            DropdownTop.BackgroundTransparency = 0.5
             DropdownTop.BackgroundColor3 = zyColor
             DropdownTop.BorderSizePixel = 0
             DropdownTop.Size = UDim2.new(0, 428, 0, 38)
@@ -1556,4 +1486,293 @@ end
       end
       return window
     end
-return library
+--return library
+local window = library:new("走马观花X-通用")
+local creds = window:Tab("基本信息")
+--local creds = window:Tab("基本信息",'3460915131')
+
+local bin = creds:section("信息",true)
+    bin:Label("你的注入器:"..identifyexecutor())
+    bin:Label("作者:小爱")
+    bin:Label("走马观花X交流群:947178829")
+
+local credits = creds:section("UI设置",true)
+
+    credits:Button("摧毁UI",function()
+        game:GetService("CoreGui")["frosty"]:Destroy()
+    end)
+
+    credits:Toggle("彩虹UI", "", false, function(state)
+        if state then
+        game:GetService("CoreGui")["frosty"].Main.Style = "DropShadow"
+        else
+            game:GetService("CoreGui")["frosty"].Main.Style = "Custom"
+        end
+    end)
+local gn = window:Tab("开发用具")
+local gn = gn:section("开发工具",true)
+gn:Button("Dex",function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+end)
+gn:Button("Dex++(dex加强版)",function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/385j8888/ZOUMAGUIX/refs/heads/main/Dex%2B%2B.lua"))()
+end)
+gn:Button("Spy",function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
+end)
+gn:Button("海龟Spy汉化版(更高级)",function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/385j8888/ZOUMAGUIX/refs/heads/main/Turtle_SPY_Chinese.lua"))()
+end)
+gn:Button("IY指令",function()
+loadstring(game:HttpGet(('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'),true))()
+end)
+gn:Button("f3x工具",function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/f3x.lua"))()
+end)
+gn:Button("RemoteBrowser远程事件浏览",function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Games1799/Scripts/refs/heads/main/RemoteBrowser"))()
+end)
+gn:Button("位置仪",function()
+-- Made by TheXploiter
+ 
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local title = Instance.new("TextLabel")
+local copy = Instance.new("TextButton")
+local pos = Instance.new("TextBox")
+local find = Instance.new("TextButton")
+ 
+--Properties:
+ 
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ 
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.639646292, 0, 0.399008662, 0)
+Frame.Size = UDim2.new(0, 387, 0, 206)
+Frame.Active = true
+ 
+title.Name = "title"
+title.Parent = Frame
+title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+title.BorderSizePixel = 0
+title.Size = UDim2.new(0, 387, 0, 50)
+title.Font = Enum.Font.GothamBold
+title.Text = "位置仪"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 30.000
+title.TextWrapped = true
+ 
+copy.Name = "copy"
+copy.Parent = Frame
+copy.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+copy.BorderSizePixel = 0
+copy.Position = UDim2.new(0.527131796, 0, 0.635922313, 0)
+copy.Size = UDim2.new(0, 148, 0, 50)
+copy.Font = Enum.Font.GothamSemibold
+copy.Text = "复制"
+copy.TextColor3 = Color3.fromRGB(255, 255, 255)
+copy.TextSize = 20.000
+ 
+pos.Name = "pos"
+pos.Parent = Frame
+pos.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+pos.BorderSizePixel = 0
+pos.Position = UDim2.new(0.0904392749, 0, 0.305825233, 0)
+pos.Size = UDim2.new(0, 317, 0, 50)
+pos.Font = Enum.Font.GothamSemibold
+pos.Text = ""
+pos.TextColor3 = Color3.fromRGB(255, 255, 255)
+pos.TextSize = 14.000
+pos.TextWrapped = true
+ 
+find.Name = "find"
+find.Parent = Frame
+find.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+find.BorderSizePixel = 0
+find.Position = UDim2.new(0.0904392898, 0, 0.635922313, 0)
+find.Size = UDim2.new(0, 148, 0, 50)
+find.Font = Enum.Font.GothamSemibold
+find.Text = "寻找"
+find.TextColor3 = Color3.fromRGB(255, 255, 255)
+find.TextSize = 20.000
+ 
+-- Scripts:
+ 
+local function UMTQ_fake_script() -- copy.LocalScript 
+    local script = Instance.new('LocalScript', copy)
+ 
+    script.Parent.MouseButton1Click:Connect(function()
+        setclipboard(script.Parent.Parent.pos.Text)
+    end)
+end
+coroutine.wrap(UMTQ_fake_script)()
+local function KJAYG_fake_script() -- Frame.Dragify 
+    local script = Instance.new('LocalScript', Frame)
+ 
+    local UIS = game:GetService("UserInputService")
+    function dragify(Frame)
+        dragToggle = nil
+        local dragSpeed = 0
+        dragInput = nil
+        dragStart = nil
+        local dragPos = nil
+        function updateInput(input)
+            local Delta = input.Position - dragStart
+            local Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
+            game:GetService("TweenService"):Create(Frame, TweenInfo.new(0.25), {Position = Position}):Play()
+        end
+        Frame.InputBegan:Connect(function(input)
+            if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and UIS:GetFocusedTextBox() == nil then
+                dragToggle = true
+                dragStart = input.Position
+                startPos = Frame.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragToggle = false
+                    end
+                end)
+            end
+        end)
+        Frame.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                dragInput = input
+            end
+        end)
+        game:GetService("UserInputService").InputChanged:Connect(function(input)
+            if input == dragInput and dragToggle then
+                updateInput(input)
+            end
+        end)
+    end
+ 
+    dragify(script.Parent)
+end
+coroutine.wrap(KJAYG_fake_script)()
+local function EKBNYI_fake_script() -- find.LocalScript 
+    local script = Instance.new('LocalScript', find)
+ 
+    script.Parent.MouseButton1Down:Connect(function()
+        script.Parent.Parent.pos.Text = tostring(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+    end)
+end
+coroutine.wrap(EKBNYI_fake_script)()
+end)
+local Globals = {
+    playernamedied = "", -- 当前选择的目标玩家
+    dropdown = {}, -- 玩家列表下拉菜单内容
+    LoopTeleport = false, -- 循环传送开关
+    message = "",
+    sayCount = 1,
+    sayFast = false,
+    autoSay = false
+}
+
+-- 刷新玩家列表函数
+function RefreshPlayerList(includeLocal)
+    Globals.dropdown = {}
+    if includeLocal == true then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            table.insert(Globals.dropdown, player.Name)
+        end
+    else
+        local localPlayer = game.Players.LocalPlayer
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= localPlayer then
+                table.insert(Globals.dropdown, player.Name)
+            end
+        end
+    end
+end
+RefreshPlayerList(true)
+
+
+local pla= window:Tab("玩家")
+local playerr = pla:section("玩家功能",true)
+local SectionTeleport = pla:section("传送玩家",true)
+
+
+local SelectedPlayer = Globals.playernamedied
+local Dropdown = SectionTeleport:Dropdown("选择玩家用户名", "Dropdown", Globals.dropdown, function(Value)
+    Globals.playernamedied = Value
+end)
+
+SectionTeleport:Button("刷新玩家名称", function()
+    RefreshPlayerList(true)
+    Dropdown:SetOptions(Globals.dropdown)
+end)
+
+SectionTeleport:Button("传送到玩家身边", function()
+    local target = game.Players:FindFirstChild(Globals.playernamedied)
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+    end
+end)
+
+SectionTeleport:Toggle("循环锁定传送", "Loop", false, function(Value)
+    Globals.LoopTeleport = Value
+    if Value then
+        while Globals.LoopTeleport do
+             local target = game.Players:FindFirstChild(Globals.playernamedied)
+             if target and target.Character then
+                 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+             end
+             wait()
+        end
+    end
+end)
+
+local SectionSpin = pla:section("旋转功能", true)
+
+local SpinSettings = {speed = 100, active = false, connection = nil}
+
+SectionSpin:Textbox("设置旋转速度", "TextBoxFlag", "输入", function(Value)
+    SpinSettings.speed = tonumber(Value) or 100
+    if SpinSettings.active then
+        local spin = game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChild("Spinbot")
+        if spin then spin.AngularVelocity = Vector3.new(0, SpinSettings.speed, 0) end
+    end
+end)
+
+SectionSpin:Toggle("开启/关闭旋转", "Spinbot", false, function(Value)
+    SpinSettings.active = Value
+    local char = game.Players.LocalPlayer.Character
+    local root = char:WaitForChild("HumanoidRootPart")
+    char.Humanoid.AutoRotate = not Value
+    
+    if Value then
+        local av = Instance.new("AngularVelocity")
+        av.Name = "Spinbot"
+        av.Attachment0 = root:WaitForChild("RootAttachment")
+        av.MaxTorque = math.huge
+        av.AngularVelocity = Vector3.new(0, SpinSettings.speed, 0)
+        av.Parent = root
+    else
+        if root:FindFirstChild("Spinbot") then root.Spinbot:Destroy() end
+    end
+end)
+
+
+playerr:Button("灵魂出窍",function()
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/385j8888/ZOUMAGUIX/refs/heads/main/%E8%87%AA%E7%94%B1%E8%A7%86%E8%A7%92.lua"))()
+end)
+playerr:Toggle("通用移除摔落伤害", "state", false, function(Value)
+    _G.AutoSelfDamage = Value
+    if _G.AutoSelfDamage then
+        spawn(function()
+            while _G.AutoSelfDamage do
+                if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Health") then
+                    game.Players.LocalPlayer.Character.Health.ForceSelfDamage:FireServer(0)
+                end
+                wait()
+            end
+        end)
+    end
+end)
+
+playerr:Button("爬墙走",function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/wallwalker.lua"))()
+end)
