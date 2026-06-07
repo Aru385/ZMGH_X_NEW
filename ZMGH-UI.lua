@@ -135,7 +135,7 @@ if theme == 'dark' then
     --zyColor= Color3.fromRGB(200, 0, 0)
     --beijingColor = Color3.fromRGB(200, 0, 0)
     MainColor = Color3.fromRGB(250, 250, 250)--不知道
-    Background = Color3.fromRGB(245, 245, 245)--右边区域背景颜色
+    Background = Color3.fromRGB(215, 215, 215)--右边区域背景颜色
     zyColor= Color3.fromRGB(255, 255, 255)--左边栏位背景颜色
     beijingColor = Color3.fromRGB(255, 255, 255)
 end
@@ -189,6 +189,8 @@ end
       Main.ZIndex = 1
       Main.Active = true
       Main.Draggable = true
+      --默认开启还是关闭↓
+      Main.Visible = false
       services.UserInputService.InputEnded:Connect(function(input)
       if input.KeyCode == Enum.KeyCode.LeftControl then
       if Main.Visible == true then
@@ -223,8 +225,52 @@ end
       DropShadow.ImageTransparency = 0.5
       DropShadow.ScaleType = Enum.ScaleType.Slice
       DropShadow.SliceCenter = Rect.new(49, 49, 450, 450)
-
-
+      
+      
+      --创建偏好
+      if not isfile("Lobby.txt") then
+          writefile("Lobby.txt", "星野")
+      end
+      
+      
+      
+      
+      
+      
+      
+      -- 创建背景图片，确保它在所有控件之下
+      --背景的图片
+      local BackgroundImage = Instance.new("ImageLabel")
+      BackgroundImage.Name = "BackgroundImage"
+      BackgroundImage.Parent = Main  -- 将背景图挂载到主框架上
+      BackgroundImage.Size = UDim2.new(1, 0, 1, 0)  -- 铺满整个主框架
+      BackgroundImage.Position = UDim2.new(0, 0, 0, 0)  -- 位置左上角对齐
+      BackgroundImage.BackgroundTransparency = 1  -- 背景透明
+      --BackgroundImage.Image = "rbxassetid://119392375941389"  -- 设置图片链接
+      BackgroundImage.ZIndex = 0  -- 设置低层级，确保所有其他控件显示在其之上
+      --89999617767498黑子
+      --119392375941389星野
+      
+      --偏好选择背景
+      if isfile("Lobby.txt") then
+        local content = readfile("Lobby.txt")
+        if content == "星野" then
+           BackgroundImage.Image = "rbxassetid://119392375941389"
+        elseif content == "黑子" then
+           BackgroundImage.Image = "rbxassetid://89999617767498"
+        elseif content == "彩虹" then
+           BackgroundImage.Image = "rbxassetid://917813114514"
+        end
+      end
+      
+      
+      
+      
+      
+      
+      
+      
+      
       UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)), ColorSequenceKeypoint.new(0.10, Color3.fromRGB(255, 127, 0)), ColorSequenceKeypoint.new(0.20, Color3.fromRGB(255, 255, 0)), ColorSequenceKeypoint.new(0.30, Color3.fromRGB(0, 255, 0)), ColorSequenceKeypoint.new(0.40, Color3.fromRGB(0, 255, 255)), ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 0, 255)), ColorSequenceKeypoint.new(0.60, Color3.fromRGB(139, 0, 255)), ColorSequenceKeypoint.new(0.70, Color3.fromRGB(255, 0, 0)), ColorSequenceKeypoint.new(0.80, Color3.fromRGB(255, 127, 0)), ColorSequenceKeypoint.new(0.90, Color3.fromRGB(255, 255, 0)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 255, 0))}
       UIGradient.Parent = DropShadow
 
@@ -413,6 +459,12 @@ end
       TabBtnsL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         TabBtns.CanvasSize = UDim2.new(0, 0, 0, TabBtnsL.AbsoluteContentSize.Y + 18)
       end)
+      
+      
+      
+      
+      
+      
       Open.Name = "Open"
       Open.Parent = dogent
       Open.BackgroundColor3 = Color3.fromRGB(255, 255, 255)--开关按钮背景颜色
@@ -424,9 +476,113 @@ end
       Open.TextSize = 14.000
       Open.Active = true
       Open.Draggable = true
+      
+      
+      --总开关后面的背景
+      local openBg = Instance.new("ImageLabel")
+      openBg.Name = "OpenBg"
+      openBg.Parent = Open   -- 选父级自动跟随位置
+      openBg.Size = UDim2.new(1, 61, 1, 80)  -- 122 x 64
+      openBg.BackgroundTransparency = 1
+      openBg.Image = "rbxassetid://115966825341902"
+      openBg.ZIndex = 0   --下层
+      --位置
+      openBg.Position = UDim2.new(0.5, -Open.Size.X.Offset, -1, -Open.Size.Y.Offset)
+      
+      
+      
+      
+      
+      
+      
+      
+      --11111
+      --开关渐变
       Open.MouseButton1Click:Connect(function()
-      Main.Visible = not Main.Visible
+          if Main.Visible then
+        -- 当前可见 → 执行淡出动画，结束后隐藏
+              local fadeOut = TweenInfo.new(0.2, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+              local tweens = {}
+        -- 收集所有需要透明度的部件
+              local function addTween(obj, prop, target)
+                  table.insert(tweens, services.TweenService:Create(obj, fadeOut, {[prop] = target}))
+              end
+        -- 主框架及主要背景部件
+            
+              addTween(Main, "BackgroundTransparency", 1)
+              addTween(Side, "BackgroundTransparency", 1)
+              addTween(SB, "BackgroundTransparency", 1)
+              addTween(TabMain, "BackgroundTransparency", 1)
+        -- 所有文本和图像标签（避免过于复杂，可以只处理已知的直接子控件）
+              for _, child in ipairs(Main:GetDescendants()) do
+                  if child:IsA("TextLabel") or child:IsA("Text") or child:IsA("TextBox") then
+                      addTween(child, "TextTransparency", 1)
+                  elseif child:IsA("ImageLabel") and child ~= DropShadow then
+                      addTween(child, "ImageTransparency", 1)
+                  elseif child:IsA("Frame") and child ~= Main and child ~= Side and child ~= SB and child.Name ~= "ToggleDisable" and child.Name ~= "ToggleSwitch" and child ~= TabMain then
+                      addTween(child, "BackgroundTransparency", 1)
+                  end
+              end
+        -- 同时播放所有淡出动画
+              for _, tween in ipairs(tweens) do tween:Play() end
+        -- 等待最长动画结束
+              task.wait(0.2)
+              Main.Visible = false
+          else
+        -- 当前隐藏 → 先设为可见但全透明，然后淡入
+              Main.Visible = true
+        -- 立即将所有相关透明度设为 1（全透明）
+              local function setTransparent(obj)
+                  if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+                      obj.TextTransparency = 0
+                  elseif obj:IsA("ImageLabel") and obj ~= DropShadow then
+                      obj.ImageTransparency = 1
+                 -- elseif obj:IsA("Frame") and obj.Name ~="ToggleDisable" then
+                    --  obj.BackgroundTransparency = 1
+                  end
+              end
+              setTransparent(Main)
+              setTransparent(Side)
+              setTransparent(SB)
+              setTransparent(TabMain)
+              for _, child in ipairs(Main:GetDescendants()) do
+                  setTransparent(child)
+              end
+        -- 淡入动画
+              local fadeIn = TweenInfo.new(0.2, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+              local tweens = {}
+              local function addTweenIn(obj, prop, target)
+                  table.insert(tweens, services.TweenService:Create(obj, fadeIn, {[prop] = target}))
+              end
+              addTweenIn(Main, "BackgroundTransparency", 1)
+              addTweenIn(Side, "BackgroundTransparency", 1)
+              addTweenIn(SB, "BackgroundTransparency", 1)
+              addTweenIn(TabMain, "BackgroundTransparency", 1)
+              for _, child in ipairs(Main:GetDescendants()) do
+                 -- if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") and child.Name ~= "SectionText" and child.Name ~= "TabText" then
+                    --  addTweenIn(child, "TextTransparency", 0)
+                     -- addTweenIn(child, "BackgroundTransparency", 0.5)
+                  if child:IsA("ImageLabel") and child ~= DropShadow then
+                      addTweenIn(child, "ImageTransparency", 0)
+                  elseif child:IsA("Frame") and child ~= Main and child ~= Side and child ~= SB and child.Name ~= "ToggleDisable" and child.Name ~= "ToggleSwitch" and child ~= TabMain then
+                      addTweenIn(child, "BackgroundTransparency", 1)
+                  end
+              end
+              for _, child in ipairs(Main.TabMain:GetDescendants()) do
+                  if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") and child.Name ~= "SectionText" and child.Name ~= "TabText" then
+                      addTweenIn(child, "TextTransparency", 0)
+                      addTweenIn(child, "BackgroundTransparency", 0.5)
+                  end
+              end
+              for _, tween in ipairs(tweens) do tween:Play() end
+          end
       end)
+      
+      
+      
+      
+      
+      
       UIG.Parent = Open
       local window = {}
       function window.Tab(window, name, icon)
@@ -596,7 +752,7 @@ end
             BtnModule.Name = "BtnModule"
             BtnModule.Parent = Objs
             BtnModule.BackgroundColor3 = Color3.fromRGB(208, 27, 28)
-            BtnModule.BackgroundTransparency = 1.000
+            BtnModule.BackgroundTransparency = 1
             BtnModule.BorderSizePixel = 0
             BtnModule.Position = UDim2.new(0, 0, 0, 0)
             BtnModule.Size = UDim2.new(0, 428, 0, 38)
