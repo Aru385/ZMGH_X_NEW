@@ -1868,7 +1868,7 @@ Tab1:AddButton({
     Title = "走马观花X通用",           -- 按钮标题
     Desc = "走马观花X通用版",   -- 按钮描述（可选）
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/385j8888/ZOUMAGUIX/refs/heads/main/%E8%B5%B0%E9%A9%AC%E8%A7%82%E8%8A%B1X%E9%80%9A%E7%94%A8.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Aru385/ZMGH_X_NEW/refs/heads/main/%E8%B5%B0%E9%A9%AC%E8%A7%82%E8%8A%B1X%E9%80%9A%E7%94%A8.lua"))()
     end
 })
 Tab1:AddButton({
@@ -1953,14 +1953,44 @@ Tab0:AddButton({
     end
 })
 local Tab2 = Window:MakeTab({
-    Title = "选择服务器",             -- 标签页标题
+    Title = "走马观花X背景偏好选择",             -- 标签页标题
     Icon = "moon"              -- 图标名称（可选，支持Lucide图标）
 })
 Tab2:AddButton({
-    Title = "点击你想要执行的服务器",           -- 按钮标题
-    Desc = "快快快",   -- 按钮描述（可选）
+    Title = "你可以在这选择你的走马观花背景",           -- 按钮标题
+    Desc = "下次启动有效，不需要每次改",   -- 按钮描述（可选）
     Callback = function()
         print("111")
+    end
+})
+Tab2:AddButton({
+    Title = "你可以在这选择你的走马观花背景",           -- 按钮标题
+    Desc = "下次启动有效，不需要每次改",   -- 按钮描述（可选）
+    Callback = function()
+        print("111")
+    end
+})
+Tab2:AddButton({
+    Title = "彩虹",           -- 按钮标题
+    Desc = "背景",   -- 按钮描述（可选）
+    Callback = function()
+        writefile("Lobby.txt", "彩虹")
+    end
+})
+
+Tab2:AddButton({
+    Title = "星野",           -- 按钮标题
+    Desc = "背景",   -- 按钮描述（可选）
+    Callback = function()
+        writefile("Lobby.txt", "星野")
+    end
+})
+
+Tab2:AddButton({
+    Title = "黑子",           -- 按钮标题
+    Desc = "背景",   -- 按钮描述（可选）
+    Callback = function()
+        writefile("Lobby.txt", "黑子")
     end
 })
 --redzlib:SetTheme("darker") -- 可选主题：Darker、Dark、Purple、Pink
