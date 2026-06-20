@@ -1998,6 +1998,14 @@ Tab2:AddButton({
         writefile("Lobby.txt", "Kei")
     end
 })
+
+Tab2:AddButton({
+    Title = "塔菲",           -- 按钮标题
+    Desc = "背景",   -- 按钮描述（可选）
+    Callback = function()
+        writefile("Lobby.txt", "塔菲")
+    end
+})
 --redzlib:SetTheme("darker") -- 可选主题：Darker、Dark、Purple、Pink
 redzlib:SetScale(340) -- 数值越大窗口越小
 local Tab3 = Window:MakeTab({
