@@ -262,6 +262,8 @@ end
            BackgroundImage.Image = "rbxassetid://917813114514"
         elseif content == "Kei" then
            BackgroundImage.Image = "rbxassetid://129844391619454"
+        elseif content == "塔菲" then
+           BackgroundImage.Image = "rbxassetid://125546006885893"
         end
       end
       
