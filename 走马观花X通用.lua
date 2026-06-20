@@ -4,8 +4,8 @@ local replicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local pplayer = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait() -- 等待角色加载
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart") -- 获取角色基准点
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local lp = game.Players.LocalPlayer
 local Mouse = lp:GetMouse()
 --local lp = gs("Players").LocalPlayer
@@ -26,33 +26,19 @@ local creds = window:Tab("基本信息")
 local bin = creds:section("信息",true)
     bin:Label("你的注入器:"..identifyexecutor())
     bin:Label("作者:小爱")
-    bin:Label("走马观花X交流群:947178829")
-
-local credits = creds:section("UI设置",true)
-
-    credits:Button("摧毁UI",function()
-        game:GetService("CoreGui")["frosty"]:Destroy()
-    end)
-
-    credits:Toggle("彩虹UI", "", false, function(state)
-        if state then
-        game:GetService("CoreGui")["frosty"].Main.Style = "DropShadow"
-        else
-            game:GetService("CoreGui")["frosty"].Main.Style = "Custom"
-        end
-    end)
+    bin:Label("走马观花X交流群:758776178")
 local gn = window:Tab("开发用具")
 local gn = gn:section("开发工具",true)
 gn:Button("Dex",function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
 end)
-gn:Button("Dex++(dex加强版)",function()
+gn:Button("Dex++",function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/385j8888/ZOUMAGUIX/refs/heads/main/Dex%2B%2B.lua"))()
 end)
 gn:Button("Spy",function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
 end)
-gn:Button("海龟Spy汉化版(更高级)",function()
+gn:Button("海龟Spy汉化版",function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/385j8888/ZOUMAGUIX/refs/heads/main/Turtle_SPY_Chinese.lua"))()
 end)
 gn:Button("IY指令",function()
@@ -632,6 +618,28 @@ end)
 local gaoj = window:Tab("高级功能")
 local gaoj = gaoj:section("高级功能",true)
 
+gaoj:Button("绕过群组验证",function()
+--!optimize 2
+
+local getnamecallmethod
+    = getnamecallmethod
+
+local Speaker = cloneref(game:GetService("Players")).LocalPlayer
+
+local OldNameCall
+
+OldNameCall = hookmetamethod(game, "__namecall", function(self, ...)
+    if self ~= Speaker or getnamecallmethod() ~= "IsInGroup" then
+        return OldNameCall(self, ...)
+    end
+
+    return true
+end)
+
+hookfunction(Speaker.IsInGroup, function(self, ...)
+    return true
+end)
+end)
 gaoj:Button("绕过Adonis反作弊",function()
 for i, v in pairs(game:GetDescendants()) do
 if v.Name == "__FUNCTION" then
@@ -1184,9 +1192,6 @@ end)
 bug:Button("后门v6x",function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/iK4oS/backdoor.exe/v6x/source.lua"))()
 end)
-bug:Button("利用fflag灵魂出窍",function()
-if getgenv().enabled == nil then getgenv().enabled = false end
-getgenv().enabled = not getgenv().enabled
 
-setfflag('NextGenReplicatorEnabledWrite4', tostring(enabled))
-end)
+
+
