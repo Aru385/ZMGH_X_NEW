@@ -1869,6 +1869,13 @@ Tab1:AddButton({
     end
 })
 Tab1:AddButton({
+    Title = "走马观花X启动",           -- 按钮标题
+    Desc = "执行当前服务器脚本",   -- 按钮描述（可选）
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Aru385/ZMGH_X_NEW/refs/heads/main/%E6%96%B0%E5%88%A4%E6%96%AD%E6%9C%8D%E5%8A%A1%E5%99%A8.lua"))()
+    end
+})
+Tab1:AddButton({
     Title = "走马观花X🐧交流群",           -- 按钮标题
     Desc = "758776178",   -- 按钮描述（可选）
     Callback = function()
@@ -1878,13 +1885,6 @@ Tab1:AddButton({
 local Tab0 = Window:MakeTab({
     Title = "走马观花X特别鸣谢",             -- 标签页标题
     Icon = "user"              -- 图标名称（可选，支持Lucide图标）
-})
-Tab0:AddButton({
-    Title = "紅",           -- 按钮标题
-    Desc = "走马观花XOwner",   -- 按钮描述（可选）
-    Callback = function()
-        print("1")
-    end
 })
 Tab0:AddButton({
     Title = "小爱",           -- 按钮标题
@@ -1942,23 +1942,9 @@ Tab0:AddButton({
         print("1")
     end
 })
-Tab0:AddButton({
-    Title = "月星",           -- 按钮标题
-    Desc = "最佳使用人员",   -- 按钮描述（可选）
-    Callback = function()
-        print("1")
-    end
-})
 local Tab2 = Window:MakeTab({
     Title = "走马观花X背景偏好选择",             -- 标签页标题
     Icon = "moon"              -- 图标名称（可选，支持Lucide图标）
-})
-Tab2:AddButton({
-    Title = "你可以在这选择你的走马观花背景",           -- 按钮标题
-    Desc = "下次启动有效，不需要每次改",   -- 按钮描述（可选）
-    Callback = function()
-        print("111")
-    end
 })
 Tab2:AddButton({
     Title = "你可以在这选择你的走马观花背景",           -- 按钮标题
@@ -2050,8 +2036,8 @@ Tab3:AddButton({
 })
 
 Window:Dialog({
-    Title = "最新版本走马观花交流群",
-    Text = "758776178最新创的，人少可以进，然后就是走马观花在重做阶段，所以目前仅有通用可以用",
+    Title = "公告",
+    Text = "758776178最新创的群，走马观花现在支持在中转站更换背景，背景可以向群主投稿，免费的，使UI更具个性化",
     Options = {
         {"好的", function()
 
