@@ -1,41 +1,38 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "FadeImageGui"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
+local gui = Instance.new("ScreenGui")
+gui.Parent = player.PlayerGui
 
-local imageLabel = Instance.new("ImageLabel")
-imageLabel.Size = UDim2.new(1, 0, 1, 0)
-imageLabel.Position = UDim2.new(0, 0, 0, 0)
-imageLabel.BackgroundTransparency = 1
-imageLabel.Image = "rbxassetid://105738561216605"
-imageLabel.ImageTransparency = 1
-imageLabel.Parent = screenGui
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.BackgroundColor3 = Color3.new(1, 0, 0)
+frame.BackgroundTransparency = 1
+frame.Parent = gui
 
-local fadeInTween = TweenService:Create(
-	imageLabel,
-	TweenInfo.new(0.5, Enum.EasingStyle.Linear),
-	{ ImageTransparency = 0 }
-)
-fadeInTween:Play()
+local image = Instance.new("ImageLabel")
+image.Size = UDim2.new(0, 200, 0, 200)
+image.Position = UDim2.new(0.5, -100, 0.5, -100)
+image.BackgroundTransparency = 1
+image.Image = "rbxassetid://105738561216605"
+image.Parent = frame
 
-task.wait(4)
+local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {BackgroundTransparency = 0})
+local tweenOut = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {BackgroundTransparency = 1})
 
-local fadeOutTween = TweenService:Create(
-	imageLabel,
-	TweenInfo.new(0.5, Enum.EasingStyle.Linear),
-	{ ImageTransparency = 1 }
-)
-fadeOutTween:Play()
 
-fadeOutTween.Completed:Wait()
-screenGui:Destroy()
 
+--local tweenInn = TweenService:Create(image, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {BackgroundTransparency = 0})
+--local tweenOutt = TweenService:Create(image, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {BackgroundTransparency = 1})
+
+
+tweenIn:Play()
+--tweenInn:Play()
+task.wait(6)
+tweenOut:Play()
+--tweenOutt:Play()
+gui:Destroy()
 
 
 
@@ -2046,7 +2043,7 @@ Tab3:AddButton({
 
 Window:Dialog({
     Title = "最新版本走马观花交流群",
-    Text = "758776178最新创的，人少可以进",
+    Text = "758776178最新创的，人少可以进，然后就是走马观花在重做阶段，所以目前仅有通用可以用",
     Options = {
         {"好的", function()
 
