@@ -1987,7 +1987,7 @@ Tab2:AddButton({
 
 Tab2:AddButton({
     Title = "塔菲",           -- 按钮标题
-    Desc = "背景",   -- 按钮描述（可选）
+    Desc = "由478346449投稿",   -- 按钮描述（可选）
     Callback = function()
         writefile("Lobby.txt", "塔菲")
     end
@@ -2035,6 +2035,105 @@ Tab3:AddButton({
     end
 })
 
+
+
+
+
+local Tab6 = Window:MakeTab({
+    Title = "走马观花X支持服务器列表",             -- 标签页标题
+    Icon = "user"              -- 图标名称（可选，支持Lucide图标）
+})
+Tab6:AddButton({
+    Title = "伐木大亨",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "战争大亨",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "战斗中的菜鸟",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "链",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "nico的下一个机器人",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "死铁轨",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "被遗弃",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "生存7天",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "森林中的99个夜晚",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "tuantu脑叶分支",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "造船寻宝",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "种植花园",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
+Tab6:AddButton({
+    Title = "恶魔学",           -- 按钮标题
+    Desc = "走马观花X",   -- 按钮描述（可选）
+    Callback = function()
+        print("1")
+    end
+})
 Window:Dialog({
     Title = "公告",
     Text = "758776178最新创的群，走马观花现在支持在中转站更换背景，背景可以向群主投稿，免费的，使UI更具个性化",
