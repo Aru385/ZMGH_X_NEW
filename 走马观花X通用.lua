@@ -27,6 +27,13 @@ local bin = creds:section("信息",true)
     bin:Label("你的注入器:"..identifyexecutor())
     bin:Label("作者:小爱")
     bin:Label("走马观花X交流群:758776178")
+    bin:Button("销毁UI",function()
+      for _, v in next, services.CoreGui:GetChildren() do
+        if v.Name == "ZOUMAGUI" then
+          v:Destroy()
+        end
+      end
+    end)
 local gn = window:Tab("开发用具")
 local gn = gn:section("开发工具",true)
 gn:Button("Dex",function()
@@ -1009,7 +1016,6 @@ end
 enableLightsShadows()
 end)
 world:Button("光影v4", function() loadstring(game:HttpGet("https://pastebin.com/raw/gUceVJig"))() end)
-world:Button("RTX高配", function() loadstring(game:HttpGet("https://pastebin.com/raw/Bkf0BJb3"))() end)
 world:Button("光影菜单", function() loadstring(game:HttpGet("https://pastefy.ga/xXkUxA0P/raw", true))() end)
 world:Button("光影", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/MZEEN2424/Graphics/main/Graphics.xml"))() end)
 
