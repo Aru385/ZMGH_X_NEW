@@ -584,6 +584,379 @@ game:GetService("Players").LocalPlayer.CameraMode = Enum.CameraMode.Classic
 end)
 
 
+local eps = window:Tab("透视2.0")
+local eps = eps:section("透视2.0",true)
+
+local fkk = false
+eps:Toggle("绘制方框", "", false, function(state)
+    fkk = state  -- 同步阀门状态
+    
+    if state then
+         local Players=game:GetService("Players")
+         local RunService=game:GetService("RunService")
+         local Camera=workspace.CurrentCamera
+         local lp=Players.LocalPlayer
+         local sg=Instance.new("ScreenGui",lp:WaitForChild("PlayerGui"))
+         sg.Name="ESP"
+         sg.ResetOnSpawn = false
+      while fkk do
+         local Players=game:GetService("Players")
+         local RunService=game:GetService("RunService")
+         local Camera=workspace.CurrentCamera
+         local lp=Players.LocalPlayer
+
+         for _,p in ipairs(Players:GetPlayers())do
+         	if p~=lp and not sg:FindFirstChild(p.Name)then
+         		local f=Instance.new("Frame")
+         		f.Name=p.Name
+         		f.BackgroundTransparency=1
+         		f.BorderSizePixel=0
+         		Instance.new("UIStroke",f).Color=Color3.new(1,0.2,0.2)
+         		f.Parent=sg
+         	end
+         end
+
+         --离
+         Players.PlayerRemoving:Connect(function(p)
+         	local f=sg:FindFirstChild(p.Name)
+         	if f then f:Destroy()end
+         end)
+
+         --会适应的
+         RunService.RenderStepped:Connect(function()
+         	local vp=Camera.ViewportSize
+         	for _,f in ipairs(sg:GetChildren())do
+         		if f:IsA("Frame")then
+         			local p=Players:FindFirstChild(f.Name)
+         			local char=p and p.Character
+         			if char then
+         				local cf,sz=char:GetBoundingBox()
+         				if cf and sz then
+         					local h=sz/2
+         					local corners={ -- 包围盒8个顶点
+         						(cf*CFrame.new( h.x, h.y, h.z)).Position,
+         						(cf*CFrame.new( h.x, h.y,-h.z)).Position,
+         						(cf*CFrame.new( h.x,-h.y, h.z)).Position,
+         						(cf*CFrame.new( h.x,-h.y,-h.z)).Position,
+         						(cf*CFrame.new(-h.x, h.y, h.z)).Position,
+         						(cf*CFrame.new(-h.x, h.y,-h.z)).Position,
+         						(cf*CFrame.new(-h.x,-h.y, h.z)).Position,
+         						(cf*CFrame.new(-h.x,-h.y,-h.z)).Position,
+         					}
+         					local minX,minY,maxX,maxY=math.huge,math.huge,-math.huge,-math.huge
+         					local vis=false
+         					for _,pos in ipairs(corners)do
+         						local s,on=Camera:WorldToScreenPoint(pos)
+         						if s.Z>0 then
+         							vis=true
+         							minX=math.min(minX,s.X)
+         							minY=math.min(minY,s.Y)
+         							maxX=math.max(maxX,s.X)
+         							maxY=math.max(maxY,s.Y)
+         						end
+         					end
+         					if vis then
+         						f.Position=UDim2.fromOffset(minX,minY)
+         						f.Size=UDim2.fromOffset(maxX-minX,maxY-minY)
+         						f.Visible=true
+         					else
+         						f.Visible=false
+         					end
+         				else
+         					f.Visible=false
+         				end
+         			else
+         				f.Visible=false
+         			end
+         		end
+         	end
+         end)
+         wait(10)
+      end
+    else
+        game.Players.LocalPlayer.PlayerGui.ESP:Destroy()
+    end
+end)
+
+
+
+
+
+local hea = false
+eps:Toggle("绘制血量", "", false, function(state)
+    hea = state  -- 同步阀门状态
+    
+    if state then
+         local Players=game:GetService("Players")
+         local RunService=game:GetService("RunService")
+         local Camera=workspace.CurrentCamera
+         local lp=Players.LocalPlayer
+         local sgg=Instance.new("ScreenGui",lp:WaitForChild("PlayerGui"))
+         sgg.Name="HealthBars"   -- 独立文件夹，不影响之前的 ESP 边框
+         sgg.ResetOnSpawn = false
+      while hea do
+         local Players=game:GetService("Players")
+         local RunService=game:GetService("RunService")
+         local Camera=workspace.CurrentCamera
+         local lp=Players.LocalPlayer
+
+-- 为已存在的其他玩家创建血条（去重）
+         for _,p in ipairs(Players:GetPlayers())do
+         	if p~=lp and not sgg:FindFirstChild(p.Name)then
+         		local bar=Instance.new("Frame")   -- 外框（黑色描边）
+         		bar.Name=p.Name
+         		bar.BackgroundTransparency=1
+         		bar.BorderSizePixel=0
+         		local stroke=Instance.new("UIStroke",bar)
+         		stroke.Color=Color3.new(0,0,0)
+         		stroke.Thickness=1.5
+         		local fill=Instance.new("Frame",bar)   -- 血量填充
+         		fill.Name="Fill"
+         		fill.Size=UDim2.new(1,0,1,0)
+         		fill.BorderSizePixel=0
+         		bar.Parent=sgg
+         	end
+         end
+
+-- 玩家离开
+         Players.PlayerRemoving:Connect(function(p)
+         	local bar=sgg:FindFirstChild(p.Name)
+         	if bar then bar:Destroy()end
+         end)
+
+-- 每帧更新位置、大小、血量颜色
+         RunService.RenderStepped:Connect(function()
+         	local vp=Camera.ViewportSize
+         	for _,bar in ipairs(sgg:GetChildren())do
+         		if bar:IsA("Frame")then
+         			local p=Players:FindFirstChild(bar.Name)
+         			local char=p and p.Character
+         			local hum=char and char:FindFirstChildOfClass("Humanoid")
+         			if hum and char.PrimaryPart then
+         				local cf,sz=char:GetBoundingBox()
+         				if cf and sz then
+					-- 使用包围盒中心点投影来定位血条，放在左侧
+         					local centerWorld=(cf*CFrame.new(-sz.x/2 - 0.5, 0, 0)).Position  -- 向左偏0.5单位
+         					local screenPos,onScreen=Camera:WorldToScreenPoint(centerWorld)
+         					if screenPos.Z>0 then
+         						local h=sz.y   -- 包围盒高度作为血条基准高度
+         						local scale=500/(screenPos.Z)  -- 距离缩放因子，可根据需要调整
+         						local barHeight=math.clamp(h*scale, 20, 80)  -- 限制最小/最大高度
+         						local barWidth=4
+         						bar.Size=UDim2.fromOffset(barWidth, barHeight)
+         						bar.Position=UDim2.fromOffset(screenPos.X - barWidth/2, screenPos.Y - barHeight/2)
+						-- 更新填充高度和颜色
+         						local fill=bar:FindFirstChild("Fill")
+         						if fill then
+         							local ratio=hum.Health/hum.MaxHealth
+         							fill.Size=UDim2.new(1,0, ratio,0)
+         							fill.Position=UDim2.new(0,0, 1-ratio,0)  -- 底部对齐
+         							local color
+         							local pct=ratio*100
+         							if pct>=70 then
+         								color=Color3.new(0,1,0)       -- 绿色
+         							elseif pct>=30 then
+         								color=Color3.new(1,0.65,0)   -- 橙色
+         							else
+         								color=Color3.new(1,0,0)       -- 红色
+         							end
+         							fill.BackgroundColor3=color
+         						end
+         						bar.Visible=true
+         					else
+         						bar.Visible=false
+         					end
+         				else
+         					bar.Visible=false
+         				end
+         			else
+         				bar.Visible=false
+         			end
+         		end
+         	end
+         end)
+         wait(10)
+      end
+    else
+        game.Players.LocalPlayer.PlayerGui.HealthBars:Destroy()
+    end
+end)
+
+
+local jl = false
+eps:Toggle("绘制距离", "", false, function(state)
+    jl = state  -- 同步阀门状态
+    
+    if state then
+      
+         local Players=game:GetService("Players")
+         local RunService=game:GetService("RunService")
+         local Camera=workspace.CurrentCamera
+         local lp=Players.LocalPlayer
+         local sggg=Instance.new("ScreenGui",lp:WaitForChild("PlayerGui"))
+         sggg.Name="DistanceLabels"
+         sggg.ResetOnSpawn = false
+      while jl do
+         local Players=game:GetService("Players")
+local RunService=game:GetService("RunService")
+local Camera=workspace.CurrentCamera
+local lp=Players.LocalPlayer
+
+-- 为已存在的其他玩家创建标签（去重）
+for _,p in ipairs(Players:GetPlayers())do
+	if p~=lp and not sggg:FindFirstChild(p.Name)then
+		local label=Instance.new("TextLabel")
+		label.Name=p.Name
+		label.BackgroundTransparency=1
+		label.TextColor3=Color3.new(1,1,1)
+		label.TextStrokeTransparency=0
+		label.TextStrokeColor3=Color3.new(0,0,0)
+		label.Font=Enum.Font.SourceSansBold
+		label.TextSize=14
+		label.Text=""
+		label.Parent=sggg
+	end
+end
+
+-- 玩家离开
+Players.PlayerRemoving:Connect(function(p)
+	local label=sggg:FindFirstChild(p.Name)
+	if label then label:Destroy()end
+end)
+
+-- 每帧更新距离和位置
+RunService.RenderStepped:Connect(function()
+	local myChar=lp.Character
+	local myRoot=myChar and myChar:FindFirstChild("HumanoidRootPart")
+	for _,label in ipairs(sggg:GetChildren())do
+		if label:IsA("TextLabel")then
+			local p=Players:FindFirstChild(label.Name)
+			local char=p and p.Character
+			local root=char and char:FindFirstChild("HumanoidRootPart")
+			if myRoot and root then
+				-- 计算距离（studs即视为米）
+				local dist=math.floor((myRoot.Position-root.Position).Magnitude+0.5)
+				label.Text=dist.."m"
+				-- 用包围盒底部中心往下偏移一点作为显示位置
+				local cf,sz=char:GetBoundingBox()
+				if cf and sz then
+					local posWorld=(cf*CFrame.new(0,-sz.y/2-0.5,0)).Position
+					local screenPos,onScreen=Camera:WorldToScreenPoint(posWorld)
+					if screenPos.Z>0 then
+						label.Position=UDim2.fromOffset(screenPos.X-label.TextBounds.X/2, screenPos.Y)
+						label.Visible=true
+					else
+						label.Visible=false
+					end
+				else
+					label.Visible=false
+				end
+			else
+				label.Visible=false
+			end
+		end
+	end
+end)
+         wait(10)
+      end
+    else
+        game.Players.LocalPlayer.PlayerGui.DistanceLabels:Destroy()
+    end
+end)
+local na =false
+eps:Toggle("绘制名字", "", false, function(state)
+    na = state  -- 同步阀门状态
+    
+    if state then
+      local Players=game:GetService("Players")
+      local RunService=game:GetService("RunService")
+      local Camera=workspace.CurrentCamera
+      local lp=Players.LocalPlayer
+      local sgm=Instance.new("ScreenGui",lp:WaitForChild("PlayerGui"))
+      sgm.Name="NameTags"
+      sgm.ResetOnSpawn = false
+      while na do
+         local Players=game:GetService("Players")
+local RunService=game:GetService("RunService")
+local Camera=workspace.CurrentCamera
+local lp=Players.LocalPlayer
+
+-- 为已存在的其他玩家创建标签（去重用 Name 作为唯一标识）
+for _,p in ipairs(Players:GetPlayers())do
+	if p~=lp and not sgm:FindFirstChild(p.Name)then
+		local label=Instance.new("TextLabel")
+		label.Name=p.Name
+		label.BackgroundTransparency=1
+		label.TextColor3=Color3.new(1,1,1)
+		label.TextStrokeTransparency=0
+		label.TextStrokeColor3=Color3.new(0,0,0)
+		label.Font=Enum.Font.SourceSansBold
+		label.TextSize=15
+		label.Text=p.DisplayName~=""and p.DisplayName or p.Name
+		label.Parent=sgm
+	end
+end
+
+-- 新玩家加入
+Players.PlayerAdded:Connect(function(p)
+	if p~=lp and not sgm:FindFirstChild(p.Name)then
+		local label=Instance.new("TextLabel")
+		label.Name=p.Name
+		label.BackgroundTransparency=1
+		label.TextColor3=Color3.new(1,1,1)
+		label.TextStrokeTransparency=0
+		label.TextStrokeColor3=Color3.new(0,0,0)
+		label.Font=Enum.Font.SourceSansBold
+		label.TextSize=15
+		label.Text=p.DisplayName~=""and p.DisplayName or p.Name
+		label.Parent=sgm
+	end
+end)
+
+-- 玩家离开
+Players.PlayerRemoving:Connect(function(p)
+	local label=sgm:FindFirstChild(p.Name)
+	if label then label:Destroy()end
+end)
+
+-- 每帧更新位置和名字（可能改名）
+RunService.RenderStepped:Connect(function()
+	for _,label in ipairs(sgm:GetChildren())do
+		if label:IsA("TextLabel")then
+			local p=Players:FindFirstChild(label.Name)
+			local char=p and p.Character
+			if char and char:IsA("Model")then
+				-- 更新名字（防止改名）
+				if p then label.Text=p.DisplayName~=""and p.DisplayName or p.Name end
+				local cf,sz=char:GetBoundingBox()
+				if cf and sz then
+					local posWorld=(cf*CFrame.new(0,sz.y/2+0.5,0)).Position  -- 头顶上方
+					local screenPos,onScreen=Camera:WorldToScreenPoint(posWorld)
+					if screenPos.Z>0 then
+						-- 根据距离自适应字体大小（可选）
+						local dist=(lp.Character and lp.Character.PrimaryPart and (lp.Character.PrimaryPart.Position-posWorld).Magnitude) or 50
+						label.TextSize=math.clamp(250/dist,10,20)
+						label.Position=UDim2.fromOffset(screenPos.X-label.TextBounds.X/2, screenPos.Y)
+						label.Visible=true
+					else
+						label.Visible=false
+					end
+				else
+					label.Visible=false
+				end
+			else
+				label.Visible=false
+			end
+		end
+	end
+end)
+         wait(10)
+      end
+    else
+        game.Players.LocalPlayer.PlayerGui.NameTags:Destroy()
+    end
+end)
+
 
 
 local pp = window:Tab("互动功能")
