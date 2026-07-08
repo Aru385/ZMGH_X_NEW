@@ -15,19 +15,33 @@ local Mouse = game:GetService('Players').LocalPlayer:GetMouse()
 --local CurrentSlot = game.Players.LocalPlayer:WaitForChild("CurrentSaveSlot").Value
 local ScriptLoadOrSave = false
 
-
-
-
-
-
-
-
-
 local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
 local workspace = game:GetService("Workspace")
 
 
+
+
+
+--local CurrentlySavingOrLoading = game.Players.LocalPlayer:WaitForChild("CurrentlySavingOrLoading")
+local mouse = game.Players.LocalPlayer:GetMouse()
+local tp = function(p)
+    lp.Character:PivotTo(p)
+end
+local window = library:new("走马观花X-Havoc")
+local creds = window:Tab("基本信息")
+--local creds = window:Tab("基本信息",'3460915131')
+
+local bin = creds:section("信息",true)
+    bin:Label("你的注入器:"..identifyexecutor())
+    bin:Label("作者:小爱")
+    bin:Label("走马观花X交流群:758776178")
+    
+    
+    
+    
+    
+    
 local function findNpcCountModel()
 	for _, child in ipairs(workspace:GetChildren()) do
 		if child:IsA("Model") and child:GetAttribute("npcCount") ~= nil then
@@ -183,28 +197,6 @@ end
 
 
 
-
-
---local CurrentlySavingOrLoading = game.Players.LocalPlayer:WaitForChild("CurrentlySavingOrLoading")
-local mouse = game.Players.LocalPlayer:GetMouse()
-local tp = function(p)
-    lp.Character:PivotTo(p)
-end
-local window = library:new("走马观花X-通用")
-local creds = window:Tab("基本信息")
---local creds = window:Tab("基本信息",'3460915131')
-
-local bin = creds:section("信息",true)
-    bin:Label("你的注入器:"..identifyexecutor())
-    bin:Label("作者:小爱")
-    bin:Label("走马观花X交流群:758776178")
-    bin:Button("销毁UI",function()
-      for _, v in next, services.CoreGui:GetChildren() do
-        if v.Name == "ZOUMAGUI" then
-          v:Destroy()
-        end
-      end
-    end)
 local gn = window:Tab("主要")
 local gn = gn:section("主要",true)
 local abba = false
@@ -613,4 +605,28 @@ for _, child in ipairs(workspace:GetDescendants()) do
     end
 end
     end
+end)
+
+local cloneref = cloneref or function(o) return o end
+
+gn:Button("全图高光",function()
+
+local cloneref = cloneref or function(o) return o end
+Lighting = cloneref(game:GetService("Lighting"))
+Lighting.Brightness = 2
+	Lighting.ClockTime = 14
+	Lighting.FogEnd = 100000
+	Lighting.GlobalShadows = false
+	Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+end)
+
+gn:Button("除雾",function()
+local cloneref = cloneref or function(o) return o end
+Lighting = cloneref(game:GetService("Lighting"))
+    Lighting.FogEnd = 100000
+	for i,v in pairs(Lighting:GetDescendants()) do
+		if v:IsA("Atmosphere") then
+			v:Destroy()
+		end
+	end
 end)
