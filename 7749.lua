@@ -109,7 +109,7 @@ old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local args = {...}
     
     if method == "Raycast" and not checkcaller() then
-        local origin = args[3] or Camera.CFrame.Position
+        local origin = args[2] or Camera.CFrame.Position
         
         if main.enable then
             local closestHead = getClosestHead()
