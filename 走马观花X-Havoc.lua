@@ -463,7 +463,7 @@ old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     
     if method == "Raycast" and not checkcaller() then
         -- 获取射击起点（通常 args[1] 是起点 Vector3）
-        local origin = args[1]
+        local origin = args[2]
         if type(origin) ~= "vector" then
             origin = Camera.CFrame.Position  -- 保险措施
         end
@@ -484,7 +484,7 @@ old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
             -- 计算从起点指向目标头部的方向向量（乘以一个足够大的距离）
             local direction = (targetHead.Position - origin).Unit * 1000
             -- 修改第二个参数（射线方向）
-            args[2] = direction
+            args[1] = direction
             -- 调用原始Raycast，传入修改后的参数
             return old(self, unpack(args))
         end
