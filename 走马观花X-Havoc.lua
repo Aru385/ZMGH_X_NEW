@@ -1,3 +1,6 @@
+local act = game:GetService("ReplicatedFirst").act
+act:Destroy()
+
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Aru385/ZMGH_X_NEW/refs/heads/main/ZMGH-UI.lua"))()
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -452,21 +455,25 @@ local function getClosestNpcHead()
 end
 
 -- ===== 替换原有的 hookmetamethod 为以下过滤版本 =====
+-- ===== 替换为以下过滤版本 =====
 local oldHook
 oldHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local method = getnamecallmethod()
     local args = {...}
 
     if method == "Raycast" and not checkcaller() then
-        -- 🔍【关键过滤】获取调用 Raycast 的脚本
-        local success, caller = pcall(getcallingscript)
-        if success and caller then
-            local name = caller.Name or ""
-            local fullPath = tostring(caller:GetFullName()) or ""
-            
-            -- 如果调用者来自相机相关模块，直接放行 (不干扰视角)
-            if name:find("Camera") or name:find("BaseCamera") or fullPath:find("Camera") then
-                return oldHook(self, ...)
+        -- 🔍【精确过滤】检测是否为相机的碰撞射线
+        local params = args[3]  -- RaycastParams 通常是第三个参数
+        if params and type(params) == "table" and params.FilterDescendantsInstances then
+            local filterList = params.FilterDescendantsInstances
+            -- 检查是否包含 workspace.Ignored（相机独有特征）
+            if type(filterList) == "table" then
+                for _, inst in ipairs(filterList) do
+                    if inst == workspace.Ignored then
+                        -- 这是相机射线，直接放行，不进行任何篡改
+                        return oldHook(self, ...)
+                    end
+                end
             end
         end
 
@@ -502,9 +509,6 @@ oldHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
 
     return oldHook(self, ...)
 end))
-
-
-
 
 
 
