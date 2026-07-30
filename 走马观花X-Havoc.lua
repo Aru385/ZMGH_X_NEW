@@ -454,7 +454,6 @@ local function getClosestNpcHead()
     return closestHead
 end
 
--- ===== 替换原有的 hookmetamethod 为以下过滤版本 =====
 -- ===== 替换为以下过滤版本 =====
 local oldHook
 oldHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
@@ -462,16 +461,25 @@ oldHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local args = {...}
 
     if method == "Raycast" and not checkcaller() then
-        -- 🔍【精确过滤】检测是否为相机的碰撞射线
+        -- 🔍 第一层：通过调用者过滤相机脚本
+        local success, caller = pcall(getcallingscript)
+        if success and caller then
+            local fullName = caller:GetFullName() or ""
+            local name = caller.Name or ""
+            -- 判断是否为相机相关脚本（路径包含 "Scripts.Camera" 或名称为 BaseCamera/Camera）
+            if fullName:find("Scripts%.Camera") or name == "BaseCamera" or name == "Camera" then
+                return oldHook(self, ...)  -- 放行，不篡改
+            end
+        end
+
+        -- 🔍 第二层：通过 RaycastParams 过滤（备用）
         local params = args[3]  -- RaycastParams 通常是第三个参数
         if params and type(params) == "table" and params.FilterDescendantsInstances then
             local filterList = params.FilterDescendantsInstances
-            -- 检查是否包含 workspace.Ignored（相机独有特征）
             if type(filterList) == "table" then
                 for _, inst in ipairs(filterList) do
                     if inst == workspace.Ignored then
-                        -- 这是相机射线，直接放行，不进行任何篡改
-                        return oldHook(self, ...)
+                        return oldHook(self, ...)  -- 相机射线，放行
                     end
                 end
             end
@@ -509,7 +517,6 @@ oldHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
 
     return oldHook(self, ...)
 end))
-
 
 
 
