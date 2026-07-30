@@ -1,5 +1,5 @@
-local act = game:GetService("ReplicatedFirst").act
-act:Destroy()
+--local act = game:GetService("ReplicatedFirst").act
+--act:Destroy()
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Aru385/ZMGH_X_NEW/refs/heads/main/ZMGH-UI.lua"))()
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
