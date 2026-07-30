@@ -454,70 +454,44 @@ local function getClosestNpcHead()
     return closestHead
 end
 
--- ===== 替换为以下过滤版本 =====
-local oldHook
-oldHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+
+
+
+old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local method = getnamecallmethod()
     local args = {...}
-
+    
     if method == "Raycast" and not checkcaller() then
-        -- 🔍 第一层：通过调用者过滤相机脚本
-        local success, caller = pcall(getcallingscript)
-        if success and caller then
-            local fullName = caller:GetFullName() or ""
-            local name = caller.Name or ""
-            -- 判断是否为相机相关脚本（路径包含 "Scripts.Camera" 或名称为 BaseCamera/Camera）
-            if fullName:find("Scripts%.Camera") or name == "BaseCamera" or name == "Camera" then
-                return oldHook(self, ...)  -- 放行，不篡改
-            end
+        -- 获取射击起点（通常 args[1] 是起点 Vector3）
+        local origin = args[1]
+        if type(origin) ~= "vector" then
+            origin = Camera.CFrame.Position  -- 保险措施
         end
-
-        -- 🔍 第二层：通过 RaycastParams 过滤（备用）
-        local params = args[3]  -- RaycastParams 通常是第三个参数
-        if params and type(params) == "table" and params.FilterDescendantsInstances then
-            local filterList = params.FilterDescendantsInstances
-            if type(filterList) == "table" then
-                for _, inst in ipairs(filterList) do
-                    if inst == workspace.Ignored then
-                        return oldHook(self, ...)  -- 相机射线，放行
-                    end
-                end
-            end
-        end
-
-        -- ===== 以下为原版子弹追踪逻辑（保持不变） =====
-        local origin = args[1] or Camera.CFrame.Position
-
+        
+        local targetHead = nil
+        
+        -- 优先玩家追踪
         if main.enable then
-            local closestHead = getClosestHead()
-            if closestHead then
-                return {
-                    Instance = closestHead,
-                    Position = closestHead.Position,
-                    Normal = (origin - closestHead.Position).Unit,
-                    Material = Enum.Material.Plastic,
-                    Distance = (closestHead.Position - origin).Magnitude
-                }
-            end
+            targetHead = getClosestHead()
         end
-
-        if main.enablenpc then
-            local closestNpcHead = getClosestNpcHead()
-            if closestNpcHead then
-                return {
-                    Instance = closestNpcHead,
-                    Position = closestNpcHead.Position,
-                    Normal = (origin - closestNpcHead.Position).Unit,
-                    Material = Enum.Material.Plastic,
-                    Distance = (closestNpcHead.Position - origin).Magnitude
-                }
-            end
+        
+        -- 若玩家未启用或未找到，且启用了NPC追踪
+        if not targetHead and main.enablenpc then
+            targetHead = getClosestNpcHead()
+        end
+        
+        if targetHead and origin then
+            -- 计算从起点指向目标头部的方向向量（乘以一个足够大的距离）
+            local direction = (targetHead.Position - origin).Unit * 1000
+            -- 修改第二个参数（射线方向）
+            args[2] = direction
+            -- 调用原始Raycast，传入修改后的参数
+            return old(self, unpack(args))
         end
     end
-
-    return oldHook(self, ...)
+    -- 其他情况或未命中目标时，正常调用原函数
+    return old(self, ...)
 end))
-
 
 
 
