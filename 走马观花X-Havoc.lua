@@ -461,38 +461,50 @@ old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local method = getnamecallmethod()
     local args = {...}
     
+    -- 只拦截 Raycast，且过滤掉脚本自身调用（checkcaller）
     if method == "Raycast" and not checkcaller() then
-        -- 获取射击起点（通常 args[1] 是起点 Vector3）
+        -- 1. 确定起点（Arg[1]）
         local origin = args[1]
-        if type(origin) ~= "vector" then
-            origin = Camera.CFrame.Position  -- 保险措施
+        -- 修复类型判断：正确写法是 typeof(...) == "Vector3"
+        if typeof(origin) ~= "Vector3" then
+            -- 有些游戏可能把 Camera.CFrame.Position 作为备选
+            origin = Camera and Camera.CFrame.Position or Vector3.new(0, 0, 0)
         end
         
+        -- 2. 寻找目标头部
         local targetHead = nil
         
-        -- 优先玩家追踪
+        -- 玩家追踪（如果开启）
         if main.enable then
             targetHead = getClosestHead()
         end
         
-        -- 若玩家未启用或未找到，且启用了NPC追踪
-       -- if not targetHead and main.enablenpc then
-           -- targetHead = getClosestNpcHead()
-        --end
+        -- NPC 追踪（如果开启，且没有找到玩家目标）
+        if not targetHead and main.enablenpc then
+            targetHead = getClosestNpcHead()
+        end
         
+        -- 3. 如果找到目标，篡改方向（Arg[2]）
         if targetHead and origin then
-            -- 计算从起点指向目标头部的方向向量（乘以一个足够大的距离）
+            -- 计算指向目标的方向向量，拉伸到足够远
             local direction = (targetHead.Position - origin).Unit * 1000
-            -- 修改第二个参数（射线方向）
-            args[2] = direction
-            -- 调用原始Raycast，传入修改后的参数
+            -- 确保 args[2] 是 Vector3 类型才修改，防止意外
+            if typeof(args[2]) == "Vector3" then
+                args[2] = direction
+            else
+                -- 极少数情况可能 args[2] 是 Ray 或其他，这时尝试修改 Ray 内部
+                if typeof(args[1]) == "Ray" then
+                    args[1] = Ray.new(origin, direction)  -- 重建 Ray
+                end
+            end
+            -- 调用原始 Raycast，传入修改后的参数
             return old(self, unpack(args))
         end
     end
-    -- 其他情况或未命中目标时，正常调用原函数
+    
+    -- 其他情况或未命中目标，正常调用原始函数
     return old(self, ...)
 end))
-
 
 
 
